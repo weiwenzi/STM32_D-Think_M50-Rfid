@@ -4,6 +4,9 @@
 
 u8 ii=0;
 extern u8 receive_data[8];//followline里面
+//////////////////////////////////////////////////////////////////////////////////
+// 修改了正点原子的范例代码
+//////////////////////////////////////////////////////////////////////////////////  
 
 //////////////////////////////////////////////////////////////////
 //加入以下代码,支持printf函数,而不需要选择use MicroLIB	  
@@ -34,7 +37,7 @@ int fputc(int ch, FILE *f)
 
 
 #if EN_USART2_RX   //如果使能了接收
-//串口1中断服务程序
+//串口2中断服务程序
 //注意,读取USARTx->SR能避免莫名其妙的错误
 u8 USART2_RX_BUF[30];     //接收缓冲,最大30个字节.
 u8 len=0;      //根据第三位判断本次接受的数据量
@@ -99,7 +102,7 @@ void USART2_IRQHandler(void)                	//串口1中断服务程序
 	if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
 	{
 
-		Res =USART_ReceiveData(USART2);//(USART1->DR);	//读取接收到的数据
+		Res = (u8)USART_ReceiveData(USART2);//(USART2->DR);	//读取接收到的数据
 		if(Res==0xAA&&USART2_RX_STA==0)  //判断一次传输的开始
 		{
 			USART2_RX_STA|=0x4000;      //接收状态
@@ -138,7 +141,7 @@ void uart2_send_mydata(u8 *data,u8 len)
 void uart2_receive_mydata(u8 *data,u8 *len)
 {
 	u8 i=0;
-	*len = (USART2_RX_STA&0xFF);
+	*len = (u8)(USART2_RX_STA&0xFF);
 	for(i=0;i<*len;i++)
 		data[i]=USART2_RX_BUF[i];
 
